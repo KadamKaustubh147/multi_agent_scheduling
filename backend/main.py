@@ -39,10 +39,12 @@ app.add_middleware(CORSMiddleware, allow_origins=["http://localhost", "https://m
 
 class ChatReq(BaseModel):
     message: str
+    thread_id: str
 
 @app.post("/api/chat")
 def chat(req: ChatReq):
-    config = {"configurable": {"thread_id": "default"}}
+    # config = {"configurable": {"thread_id": "default"}}
+    config = {"configurable": {"thread_id": req.thread_id}}
 
     result = app.state.graph.invoke(
         {"messages": [HumanMessage(content=req.message)], "intent": None},
@@ -62,10 +64,11 @@ def chat(req: ChatReq):
     return {"messages": out}
 
 @app.get("/api/messages")
-async def get_messages():
+async def get_messages(thread_id: str):
     """Load previous messages on page refresh."""
     try:
-        config = {"configurable": {"thread_id": "default"}}
+        # config = {"configurable": {"thread_id": "default"}}
+        config = {"configurable": {"thread_id": thread_id}}
         raw = []
 
         # Handle different langgraph checkpoint versions

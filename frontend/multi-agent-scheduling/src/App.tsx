@@ -2,6 +2,15 @@ import { useState, useEffect, useRef } from "react";
 
 const API = "https://multi-agent-scheduling.onrender.com";
 
+function getThreadId() {
+  let id = localStorage.getItem("thread_id");
+  if (!id) {
+    id = crypto.randomUUID();
+    localStorage.setItem("thread_id", id);
+  }
+  return id;
+}
+
 interface Msg {
   type: string;
   content: string;
@@ -18,10 +27,12 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [initialLoad, setInitialLoad] = useState(true); // Prevents empty state flash
   const bottom = useRef<HTMLDivElement>(null);
+  const threadId = useRef(getThreadId()).current;
 
   // Load history on mount
   useEffect(() => {
-    fetch(`${API}/api/messages`)
+    // fetch(`${API}/api/messages`)
+    fetch(`${API}/api/messages?thread_id=${threadId}`)
       .then((res) => res.json())
       .then((data) => setMessages(data.messages || []))
       .catch(() => {})
@@ -47,7 +58,7 @@ export default function App() {
       const res = await fetch(`${API}/api/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: text }),
+        body: JSON.stringify({ message: text, thread_id: threadId }),
       });
       const data = await res.json();
       setMessages(data.messages);
