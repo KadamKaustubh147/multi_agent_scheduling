@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 
-const API = "https://multi-agent-scheduling.onrender.com/";
+const API = "https://multi-agent-scheduling.onrender.com";
 
 interface Msg {
   type: string;
