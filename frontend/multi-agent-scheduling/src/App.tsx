@@ -155,25 +155,22 @@ export default function App() {
 }
 
 // --- Extracted Message Bubble Component ---
-
 function MessageBubble({ message, onPickSlot }: { message: Msg; onPickSlot: (text: string) => void }) {
   const isHuman = message.type === "human";
-  const isToolCall = message.type === "ai" && message.tool_calls?.length;
+  const isToolCall = message.type === "ai" && !!message.tool_calls?.length;
   const isToolResult = message.type === "tool";
   const isAiText = message.type === "ai" && message.content;
 
-  // Tool Call Badge (collapsible look)
   if (isToolCall) {
     return (
       <div className="flex justify-center animate-[fadeIn_0.2s_ease-in]">
         <div className="inline-flex items-center gap-2 text-xs text-slate-400 bg-slate-800/40 border border-slate-700/30 rounded-full px-4 py-1.5">
           <span className="h-1.5 w-1.5 bg-amber-400 rounded-full animate-pulse" />
-          {message.tool_calls.map((t) => t.name).join(", ")}
+          {(message.tool_calls ?? []).map((t) => t.name).join(", ")}
         </div>
       </div>
     );
   }
-
   // Availability results get a rich slot grid instead of a plain badge
   if (isToolResult && message.name === "check_availability") {
     return <AvailabilityCard content={message.content} onPickSlot={onPickSlot} />;
